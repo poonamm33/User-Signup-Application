@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f6ff;
+            text-align: center;
+            padding-top: 80px;
+        }
+
+        .container {
+            background: white;
+            width: 500px;
+            margin: auto;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px #ccc;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        #userData {
+            background: #f3f4f6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Welcome to Dashboard</h1>
+
+    <div id="userData">
+        Loading user information...
+    </div>
+
+    <button onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+
+async function loadProfile() {
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+        window.location.href = "login.html";
+        return;
+
+    }
+
+    try {
+
+        const response = await fetch("/api/user/profile", {
+
+            method: "GET",
+
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            localStorage.removeItem("token");
+
+            window.location.href = "login.html";
+            return;
+
+        }
+
+        document.getElementById("userData").innerHTML = `
+            <p><strong>User ID:</strong> ${data.user?.id || "N/A"}</p>
+            <p><strong>Username:</strong> ${data.user?.username || "N/A"}</p>
+            <p><strong>Role:</strong> ${data.user?.role || "N/A"}</p>
+        `;
+
+    } catch (error) {
+
+        document.getElementById("userData").innerText =
+            "Unable to load user information.";
+
+    }
+
+}
+
+function logout() {
+
+    localStorage.removeItem("token");
+
+    window.location.href = "login.html";
+
+}
+
+loadProfile();
+
+</script>
+
+</body>
+</html>
